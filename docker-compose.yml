@@ -1,0 +1,44 @@
+version: '3.7'
+
+# map is LOCAL:CONTAINER
+
+services:
+    php-httpd:
+        build:
+            context: ./php-httpd
+        ports:
+            - 80:80
+        volumes:
+            - "./DocumentRoot:/var/www/html"
+
+    mysqldb:
+        image: mysql:5.7
+        restart: always
+        environment:
+          MYSQL_DATABASE: 'dbname'
+          # So you don't have to use root, but you can if you like
+          MYSQL_USER: 'username'
+          # You can use whatever password you like
+          MYSQL_PASSWORD: 'password'
+          # Password for root access
+          MYSQL_ROOT_PASSWORD: 'password'
+        ports:
+          # <Port exposed> : < MySQL Port running inside container>
+          - '3306:3306'
+        expose:
+          # Opens port 3306 on the container
+          - '3306'
+          # Where our data will be persisted
+        volumes:
+          - vol-mysql:/var/lib/mysql
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        links:
+            - 'mysqldb:db'
+        ports:
+            - 8081:80
+
+# Names our volume
+volumes:
+  vol-mysql:
