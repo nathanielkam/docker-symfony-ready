@@ -1,7 +1,16 @@
+# FROM the original image 
 FROM php:7.3-apache
 LABEL maintainer="egdoc.dev@gmail.com"
 
-RUN apt-get update && apt-get install -y \
+# Replace Configs
+COPY ./apache2.conf /etc/apache2/apache2.conf
+COPY ./000-default.conf /etc/apache2/sites-enabled/000-default.conf
+
+# Manually Install Extensions
+RUN apt-get update \ 
+    && apt-get install -y \
+        vim \
+    && apt-get install -y \
 		libmcrypt-dev \
 		zlib1g-dev g++ git libicu-dev zip libzip-dev zip \
     && pecl install \ 
@@ -13,12 +22,10 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure zip \
     && docker-php-ext-install zip
 
-# Install Composer
+# Manually Install Composer 
 WORKDIR /var/www/symfony_docker
-
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
 RUN curl -sS https://get.symfony.com/cli/installer | bash
 RUN mv /root/.symfony/bin/symfony /usr/local/bin/symfony
-RUN git config --global user.email "nathaniel.kam@gmail.com" \ 
-    && git config --global user.name "Nathaniel Kam"
+RUN git config --global user.email "email@domain.com" \ 
+    && git config --global user.name "username"
